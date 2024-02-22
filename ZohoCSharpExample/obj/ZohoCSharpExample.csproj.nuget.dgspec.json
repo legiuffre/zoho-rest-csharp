@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj": {}
+    "c:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj": {}
   },
   "projects": {
-    "C:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj": {
+    "c:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj",
+        "projectUniqueName": "c:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj",
         "projectName": "ZohoCSharpExample",
-        "projectPath": "C:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj",
+        "projectPath": "c:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\ZohoCSharpExample.csproj",
         "packagesPath": "C:\\Users\\LauraGiuffre\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\obj\\",
+        "outputPath": "c:\\Users\\LauraGiuffre\\Documents\\GitHub\\zoho-rest-csharp\\ZohoCSharpExample\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\LauraGiuffre\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -50,6 +50,10 @@
             "RestSharp": {
               "target": "Package",
               "version": "[110.2.0, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.6, )"
             }
           },
           "imports": [

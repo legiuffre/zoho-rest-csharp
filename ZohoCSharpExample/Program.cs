@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
 using System.Web;
+using System.Data.SqlClient;
 
 public class Program
 {
@@ -57,6 +58,39 @@ public class Program
                     {
                         Console.WriteLine(i[0]);
                         Console.WriteLine(i[0]["Email"]);
+                        string conn = @"Data Source=REL-LAURAG-LEN;Initial Catalog="+configData.database+";User ID="+configData.username+";Password="+configData.password;
+                       
+                        string insertQuery = "INSERT INTO invoices (email) VALUES (@Email)";
+
+                        using (SqlConnection connection = new SqlConnection(conn))
+                        {
+                            try
+                            {
+                                // Open the connection
+                                connection.Open();
+
+                                Console.WriteLine("Connected to SQL Server");
+
+                                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                                {
+                                    // Add parameters to the command to prevent SQL injection
+                                    command.Parameters.AddWithValue("@Email", i[0]["Email"].ToString());
+
+                                    // Execute the command
+                                    int rowsAffected = command.ExecuteNonQuery();
+
+                                    // Output the number of rows affected
+                                    Console.WriteLine($"{rowsAffected} row(s) inserted successfully.");
+                                }
+                                // Close the connection
+                                connection.Close();
+                                Console.WriteLine("Connection closed.");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Error: " + ex.Message);
+                            }
+                        }
                     }
                 }
             }
@@ -88,4 +122,7 @@ public class Config
     public string client_secret {get;set;}
     public string grant_type {get;set;}
     public string refresh_token {get;set;}
+    public string username {get;set;}
+    public string password {get;set;}
+    public string database {get;set;}
 }

@@ -17,3 +17,9 @@ c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\obj\De
 c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\obj\Debug\net8.0\ref\ZohoCSharpExample.dll
 c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\Newtonsoft.Json.dll
 c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\obj\Debug\net8.0\ZohoCSharpExample.sourcelink.json
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\System.Data.SqlClient.dll
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\runtimes\win-arm64\native\sni.dll
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\runtimes\win-x64\native\sni.dll
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\runtimes\win-x86\native\sni.dll
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+c:\Users\LauraGiuffre\Documents\GitHub\zoho-rest-csharp\ZohoCSharpExample\bin\Debug\net8.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
