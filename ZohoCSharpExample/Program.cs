@@ -1,128 +1,132 @@
-﻿using RestSharp;
-using RestSharp.Authenticators;
-using System;
+﻿using System.Data.SqlClient;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
-using System.ComponentModel.DataAnnotations;
-using System.Web;
-using System.Data.SqlClient;
-
+using ZohoCSharpExample.Models;
 public class Program
 {
+    private static string sqlQuery;
+
     public static async Task Main(string[] args)
     {
         string filepath = "C:/Users/LauraGiuffre/Documents/GitHub/zoho-rest-csharp/.vscode/config.json";
         string jsonData = File.ReadAllText(filepath);
         Config configData = JsonConvert.DeserializeObject<Config>(jsonData);
-        // Console.WriteLine(configData.client_id);
-        var options = new RestClientOptions("https://accounts.zoho.com")
+
+        try
         {
-            MaxTimeout = -1,
-        };
-        var client = new RestClient(options);
-        var request = new RestRequest("/oauth/v2/token?refresh_token="+configData.refresh_token+"&client_id="+configData.client_id+"&client_secret="+configData.client_secret+"&grant_type="+configData.grant_type, Method.Post);
-        RestResponse response = await client.ExecuteAsync(request);
+            string accountURL = "https://accounts.zoho.com";
 
-        // Check if the request was successful
-        if (response.IsSuccessful)
-        {
-            // Deserialize the JSON response
-            var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(value: response.Content);
+            ApiClient acctApiClient = new ApiClient(accountURL);
 
-            // Access the access token
-            string accessToken = tokenResponse.access_token;
+            string tokenPost = "/oauth/v2/token?refresh_token="+configData.refresh_token+"&client_id="+configData.client_id+"&client_secret="+configData.client_secret+"&grant_type="+configData.grant_type;
+           
+            var tokenPostResponse = await acctApiClient.PostResourceAsync(tokenPost, null);
 
-            // Print the access token
-            Console.WriteLine("Access Token: " + accessToken);
-
-            var invOptions = new RestClientOptions("https://www.zohoapis.com")
+            Console.WriteLine(tokenPostResponse.Content);
+           
+            if (tokenPostResponse.IsSuccessful)
             {
-                MaxTimeout = -1,
-            };
-            var invClient = new RestClient(invOptions);
-            var invRequest = new RestRequest("/crm/v6/Invoices/4996294000090071695", Method.Get);
-            invRequest.AddHeader("Content-Type", "application/json");
-            invRequest.AddHeader("Authorization", "Zoho-oauthtoken " + accessToken);
-            RestResponse invResponse = await invClient.ExecuteAsync(invRequest);
-            
-            if (invResponse.IsSuccessful)
-            {
-                // Console.WriteLine("invResponse: " + invResponse.Content);
-                var invJsonResp = JsonConvert.DeserializeObject<dynamic>(value: invResponse.Content);
+                // Deserialize the JSON response
+                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(value: tokenPostResponse.Content);
+
+                // Access the access token
+                string accessToken = tokenResponse.access_token;
+
+                // Print the access token
+                Console.WriteLine("Access Token: " + accessToken);
                 
-                foreach(var val in invJsonResp)
+                try
                 {
-                    // Console.WriteLine(val);
-                    foreach(var i in val)
+                    string invBaseURL = "https://www.zohoapis.com";                    
+                    ApiClient invAPIClient = new ApiClient(invBaseURL);
+                    string invGet = "/crm/v6/Invoices/4996294000090071703";
+
+                    var invResponse = await invAPIClient.GetResourceAsync(invGet, accessToken);
+                    Console.WriteLine(invResponse.Content);
+                    if (invResponse.IsSuccessful)
                     {
-                        Console.WriteLine(i[0]);
-                        Console.WriteLine(i[0]["Email"]);
-                        string conn = @"Data Source=REL-LAURAG-LEN;Initial Catalog="+configData.database+";User ID="+configData.username+";Password="+configData.password;
-                       
-                        string insertQuery = "INSERT INTO invoices (email) VALUES (@Email)";
+                        var invJsonResp = JsonConvert.DeserializeObject<Invoice>(value: invResponse.Content);
+                        Console.WriteLine(invJsonResp.data);
 
-                        using (SqlConnection connection = new SqlConnection(conn))
+                        foreach(var data in invJsonResp.data)
                         {
-                            try
+                            string ownerName = data.Owner.name;
+                            string email = data.email;
+                            string id = data.Owner.id;
+
+                            string conn = @"Data Source=REL-LAURAG-LEN;Initial Catalog="+configData.database+";User ID="+configData.username+";Password="+configData.password;                 
+
+                            using (SqlConnection connection = new SqlConnection(conn))
                             {
-                                // Open the connection
-                                connection.Open();
-
-                                Console.WriteLine("Connected to SQL Server");
-
-                                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                                try
                                 {
-                                    // Add parameters to the command to prevent SQL injection
-                                    command.Parameters.AddWithValue("@Email", i[0]["Email"].ToString());
+                                    // Open the connection
+                                    connection.Open();
 
-                                    // Execute the command
-                                    int rowsAffected = command.ExecuteNonQuery();
+                                    Console.WriteLine("Connected to SQL Server");
+                                    string selectQuery = "SELECT COUNT(*) FROM invoices WHERE zoho_record_id = @ZohoRecordId";             
+                                    SqlCommand selectCommand = new SqlCommand(selectQuery, connection);
+                                    selectCommand.Parameters.AddWithValue("@ZohoRecordId", Convert.ToInt64(id));
 
-                                    // Output the number of rows affected
-                                    Console.WriteLine($"{rowsAffected} row(s) inserted successfully.");
+                                    int count = (int)selectCommand.ExecuteScalar();
+                                    Console.WriteLine(count);
+                                    if(count > 0)
+                                    {
+                                        sqlQuery = "UPDATE invoices SET email = @Email WHERE zoho_record_id = @ZohoRecordId";
+                                    }
+                                    else
+                                    {
+                                        sqlQuery = "INSERT INTO invoices (email, zoho_record_id) VALUES (@Email,@ZohoRecordId)";                              
+                                    }
+                                    Console.WriteLine("sqlQuery: " + sqlQuery);
+                                    using (var cmd = new SqlCommand(sqlQuery, connection))
+                                    {
+                                        cmd.Parameters.AddWithValue("@Email", email);
+                                        cmd.Parameters.AddWithValue("@ZohoRecordId", Convert.ToInt64(id));
+
+                                        int rowsAffected = cmd.ExecuteNonQuery();
+                                        Console.WriteLine($"{rowsAffected} row(s) updated successfully.");
+                                    }
+
+                                    // Close the connection
+                                    connection.Close();
+                                    Console.WriteLine("Connection closed.");
                                 }
-                                // Close the connection
-                                connection.Close();
-                                Console.WriteLine("Connection closed.");
+                                catch (Exception ex)
+                                {
+                                    // Close the connection
+                                    connection.Close();
+                                    Console.WriteLine("Connection closed.");
+                                    Console.WriteLine("Error: " + ex.Message);
+                                }
                             }
-                            catch (Exception ex)
+                            
+                            foreach (var item in data.Invoiced_Items)
                             {
-                                Console.WriteLine("Error: " + ex.Message);
+                                string desc = item.Description;
+                                int quantity = item.Quantity;
+                                double total = item.Total;
                             }
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine("Error: " + invResponse.ErrorMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
                 }
             }
             else
             {
-                Console.WriteLine("Error: " + invResponse.ErrorMessage);
+                Console.WriteLine("Error: " + tokenPostResponse.ErrorMessage);
             }
 
-
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("Error: " + response.ErrorMessage);
+            Console.WriteLine($"An error occurred: {ex.Message}");
         }
     }
-}
-
-// Define a class to represent the structure of the JSON response
-public class TokenResponse
-{
-    public string access_token { get; set; }
-    public string token_type { get; set; }
-    public int expires_in { get; set; }
-}
-
-public class Config
-{
-    public string client_id {get;set;}
-    public string client_secret {get;set;}
-    public string grant_type {get;set;}
-    public string refresh_token {get;set;}
-    public string username {get;set;}
-    public string password {get;set;}
-    public string database {get;set;}
 }

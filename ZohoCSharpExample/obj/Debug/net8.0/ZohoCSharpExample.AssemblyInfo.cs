@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ZohoCSharpExample")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d3200182c9894231daf86da6a250e931b2f9b6e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e58b1afa6dbf3f5dc632b3af092f10d9142bed09")]
 [assembly: System.Reflection.AssemblyProductAttribute("ZohoCSharpExample")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ZohoCSharpExample")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
